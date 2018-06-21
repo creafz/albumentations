@@ -25,4 +25,4 @@ install:
   - pip install -e .[tests]
 
 script:
-  py.test -v albumentations
+  py.test -v
