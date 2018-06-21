@@ -2,10 +2,13 @@ language: python
 
 cache: pip
 
-python:
-  - '2.7'
-  - '3.5'
-  - '3.6'
+matrix:
+  include:
+    - python: 2.7
+    - python: 3.5
+    - python: 3.6
+    - python: 3.6
+      env: TEST_MODE=PYCODESTYLE
 
 install:
   - sudo apt-get update
@@ -30,5 +33,8 @@ install:
   - pip install pycodestyle
 
 script:
-  - py.test -v
-  - pycodestyle . --max-line-length 119 --ignore=E402
+  - if [[ "$TEST_MODE" == "PYCODESTYLE" ]]; then
+      pycodestyle . --max-line-length 119 --ignore=E402
+    else
+      py.test -v
+    fi
