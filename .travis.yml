@@ -13,7 +13,7 @@ matrix:
       env: TEST_MODE=PEP8
 
 install:
-  - pip install -e .[tests]
+  - pip install .[tests]
   - pip install pycodestyle
 
 script:
