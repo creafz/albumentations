@@ -20,5 +20,5 @@ script:
   - if [[ "$TEST_MODE" == "PEP8" ]]; then
       pycodestyle . --max-line-length 119 --ignore=E402;
     else
-      py.test -v;
+      pytest;
     fi
