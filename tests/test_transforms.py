@@ -1,3 +1,4 @@
+import sys
 from multiprocessing.pool import Pool
 
 import numpy as np
@@ -8,7 +9,6 @@ from albumentations import Transpose, Rotate, ShiftScaleRotate, OpticalDistortio
     VerticalFlip, HorizontalFlip, RandomSizedCrop, RandomScale, IAAPiecewiseAffine, IAAAffine, IAAPerspective, \
     LongestMaxSize, Resize, IAASharpen
 import albumentations.augmentations.functional as F
-from .conftest import skip_appveyor
 
 
 def test_transpose_both_image_and_mask():
@@ -160,7 +160,7 @@ def __test_multiprocessing_support_proc(args):
     [IAAPerspective, {}],
     [IAASharpen, {}]
 ])
-@skip_appveyor
+@pytest.mark.skipif(sys.platform == 'win32' and sys.version_info < (3, 0), reason='skip on windows')
 def test_multiprocessing_support(augmentation_cls, params):
     """Checks whether we can use augmetnations in multi-threaded environments"""
     aug = augmentation_cls(p=1, **params)
