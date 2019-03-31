@@ -8,6 +8,10 @@ cache:
   directories:
     - $HOME/.cache/pip
 
+stages:
+  - Test
+  - Deploy
+
 env:
   - IMGAUG_NO_CV2_INSTALLED_CHECK=TRUE
 
@@ -23,11 +27,20 @@ matrix:
       sudo: true
 
 install:
-- if [[ "$TEST_MODE" == "DOCS" ]]; then pip install .; fi
-- if [[ "$TEST_MODE" != "DOCS" ]]; then pip install .[tests]; fi
-- if [[ "$TEST_MODE" != "DOCS" ]]; then pip install flake8 flake8-docstrings; fi
+- echo Install
+#- if [[ "$TEST_MODE" == "DOCS" ]]; then pip install .; fi
+#- if [[ "$TEST_MODE" != "DOCS" ]]; then pip install .[tests]; fi
+#- if [[ "$TEST_MODE" != "DOCS" ]]; then pip install flake8 flake8-docstrings; fi
 
 script:
-  - if [[ "$TEST_MODE" == "DOCS" ]]; then python tools/make_transforms_docs.py check README.md; fi
-  - if [[ "$TEST_MODE" != "DOCS" ]]; then pytest; fi
-  - if [[ "$TEST_MODE" != "DOCS" ]]; then flake8; fi
+- echo Script
+#  - if [[ "$TEST_MODE" == "DOCS" ]]; then python tools/make_transforms_docs.py check README.md; fi
+#  - if [[ "$TEST_MODE" != "DOCS" ]]; then pytest; fi
+#  - if [[ "$TEST_MODE" != "DOCS" ]]; then flake8; fi
+
+
+jobs:
+  include:
+    - stage: Deploy
+      script: echo Deploy
+      python: 3.6
