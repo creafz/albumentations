@@ -29,39 +29,48 @@ stage_test_docs: &stage_test_docs
 
 stages:
   - test
-  - test_docs
 #  - deploy
 
 jobs:
   include:
     - stage: test
       <<: *stage_test
+      name: 'Python 2.7'
       python: 2.7
       env:
         - IMGAUG_NO_CV2_INSTALLED_CHECK=TRUE
         - PYTORCH_WHEEL=https://download.pytorch.org/whl/cpu/torch-1.0.1.post2-cp27-cp27mu-linux_x86_64.whl
     - stage: test
       <<: *stage_test
+      name: 'Python 3.5'
       python: 3.5
       env:
         - IMGAUG_NO_CV2_INSTALLED_CHECK=TRUE
         - PYTORCH_WHEEL=https://download.pytorch.org/whl/cpu/torch-1.0.1.post2-cp35-cp35m-linux_x86_64.whl
     - stage: test
       <<: *stage_test
+      name: 'Python 3.6'
       python: 3.6
       env:
         - IMGAUG_NO_CV2_INSTALLED_CHECK=TRUE
         - PYTORCH_WHEEL=https://download.pytorch.org/whl/cpu/torch-1.0.1.post2-cp36-cp36m-linux_x86_64.whl
     - stage: test
       <<: *stage_test
+      name: 'Python 3.7'
       python: 3.7
       env:
         - IMGAUG_NO_CV2_INSTALLED_CHECK=TRUE
         - PYTORCH_WHEEL=https://download.pytorch.org/whl/cpu/torch-1.0.1.post2-cp37-cp37m-linux_x86_64.whl
       dist: xenial
       sudo: true
-    - stage: test_docs
-      <<: *stage_test_docs
+    - stage: test
+      <<: *stage_test
+      name: 'Docs'
+      install:
+        - pip install .
+        - if [[ -n "$PYTORCH_WHEEL" ]]; then pip install "$PYTORCH_WHEEL" torchvision; fi
+      script:
+        - python tools/make_transforms_docs.py check README.md
 
     #- stage: deploy
 #      deploy:
