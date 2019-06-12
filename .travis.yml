@@ -76,6 +76,10 @@ jobs:
       name: 'Deploy to PyPi'
       language: python
       python: 3.6
+      install:
+        - echo "install"
+      script:
+        - echo "script"
       deploy:
         provider: pypi
         user: $PYPI_USER
