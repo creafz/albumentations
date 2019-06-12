@@ -28,7 +28,7 @@ stage_test_docs: &stage_test_docs
     - python tools/make_transforms_docs.py check README.md
 
 stages:
-  - test
+  #- test
   - deploy
 
 jobs:
@@ -72,8 +72,9 @@ jobs:
         - if [[ -n "$PYTORCH_WHEEL" ]]; then pip install "$PYTORCH_WHEEL" torchvision; fi
       script:
         - python tools/make_transforms_docs.py check README.md
-
     - stage: deploy
+      name: 'Deploy to PyPi'
+      python: 3.6
       deploy:
         provider: pypi
         user: $PYPI_USER
@@ -83,6 +84,8 @@ jobs:
         server: $PYPI_SERVER
         skip_cleanup: true
     - stage: deploy
+      name: 'Deploy to Anaconda'
+      python: 3.6
       before_deploy:
         - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
         - bash miniconda.sh -b -p $HOME/miniconda
