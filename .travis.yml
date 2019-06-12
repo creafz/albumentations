@@ -84,8 +84,8 @@ jobs:
         provider: pypi
         user: $PYPI_USER
         password: $PYPI_PASSWORD
-#        on:
-#          tags: true
+        on:
+          tags: true
         server: $PYPI_SERVER
         skip_cleanup: true
     - stage: deploy
