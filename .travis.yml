@@ -74,6 +74,7 @@ jobs:
         - python tools/make_transforms_docs.py check README.md
     - stage: deploy
       name: 'Deploy to PyPi'
+      language: python
       python: 3.6
       deploy:
         provider: pypi
@@ -85,6 +86,7 @@ jobs:
         skip_cleanup: true
     - stage: deploy
       name: 'Deploy to Anaconda'
+      language: python
       python: 3.6
       before_deploy:
         - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
