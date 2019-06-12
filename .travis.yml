@@ -14,7 +14,7 @@ stage_test: &stage_test
     - pip install --upgrade pip pytest
     - if [[ -n "$PYTORCH_WHEEL" ]]; then pip install "$PYTORCH_WHEEL" torchvision; fi
     - pip install .[tests]
-    - pip install flake8 flake8-docstrings;
+    - pip install flake8 flake8-docstrings
   script:
     - pytest
     - flake8
@@ -22,10 +22,10 @@ stage_test: &stage_test
 stage_test_docs: &stage_test_docs
   <<: *stage_test
   install:
-    - pip install .;
+    - pip install .
     - if [[ -n "$PYTORCH_WHEEL" ]]; then pip install "$PYTORCH_WHEEL" torchvision; fi
   script:
-    - python tools/make_transforms_docs.py check README.md;
+    - python tools/make_transforms_docs.py check README.md
 
 stages:
   - test
