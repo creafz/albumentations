@@ -84,8 +84,8 @@ jobs:
         provider: pypi
         user: $PYPI_USER
         password: $PYPI_PASSWORD
-        on:
-          tags: true
+#        on:
+#          tags: true
         server: $PYPI_SERVER
         skip_cleanup: true
     - stage: deploy
@@ -103,8 +103,8 @@ jobs:
         - conda create -q -n deploy-environment -c pytorch python=$TRAVIS_PYTHON_VERSION
         - source activate deploy-environment
         - cd conda.recipe
-      on:
-        tags: true
+#      on:
+#        tags: true
       deploy:
         provider: script
         script: sh build_upload.sh
