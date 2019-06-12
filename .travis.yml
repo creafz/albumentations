@@ -29,7 +29,7 @@ stage_test_docs: &stage_test_docs
 
 stages:
   - test
-#  - deploy
+  - deploy
 
 jobs:
   include:
@@ -66,38 +66,39 @@ jobs:
     - stage: test
       <<: *stage_test
       name: 'Docs'
+      python: 3.6
       install:
         - pip install .
         - if [[ -n "$PYTORCH_WHEEL" ]]; then pip install "$PYTORCH_WHEEL" torchvision; fi
       script:
         - python tools/make_transforms_docs.py check README.md
 
-    #- stage: deploy
-#      deploy:
-#        provider: pypi
-#        user: $PYPI_USER
-#        password: $PYPI_PASSWORD
-#        on:
-#          tags: true
-#        server: $PYPI_SERVER
-#        skip_cleanup: true
-#    - stage: deploy
-#      before_deploy:
-#        - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
-#        - bash miniconda.sh -b -p $HOME/miniconda
-#        - export PATH="$HOME/miniconda/bin:$PATH"
-#        - hash -r
-#        - conda config --set always_yes yes --set changeps1 no
-#        - conda update -q conda
-#        - conda info -a
-#        - conda create -q -n deploy-environment -c pytorch python=$TRAVIS_PYTHON_VERSION
-#        - source activate deploy-environment
-#        - cd conda.recipe
-#        on:
-#          tags: true
-#      deploy:
-#        provider: script
-#        script: sh build_upload.sh
-#        on:
-#          tags: true
-#        skip_cleanup: true
+    - stage: deploy
+      deploy:
+        provider: pypi
+        user: $PYPI_USER
+        password: $PYPI_PASSWORD
+        on:
+          tags: true
+        server: $PYPI_SERVER
+        skip_cleanup: true
+    - stage: deploy
+      before_deploy:
+        - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+        - bash miniconda.sh -b -p $HOME/miniconda
+        - export PATH="$HOME/miniconda/bin:$PATH"
+        - hash -r
+        - conda config --set always_yes yes --set changeps1 no
+        - conda update -q conda
+        - conda info -a
+        - conda create -q -n deploy-environment -c pytorch python=$TRAVIS_PYTHON_VERSION
+        - source activate deploy-environment
+        - cd conda.recipe
+        on:
+          tags: true
+      deploy:
+        provider: script
+        script: sh build_upload.sh
+        on:
+          tags: true
+        skip_cleanup: true
