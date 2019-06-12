@@ -31,17 +31,18 @@ matrix:
       sudo: true
 
 install:
-- pip install --upgrade pip pytest
-- if [[ "$TEST_MODE" == "DOCS" ]]; then pip install .; fi
-- if [[ -n "$PYTORCH_WHEEL" ]]; then pip install "$PYTORCH_WHEEL" torchvision; fi
-- if [[ "$TEST_MODE" != "DOCS" ]]; then pip install .[tests]; fi
-- if [[ "$TEST_MODE" != "DOCS" ]]; then pip install flake8 flake8-docstrings; fi
+#- pip install --upgrade pip pytest
+#- if [[ "$TEST_MODE" == "DOCS" ]]; then pip install .; fi
+#- if [[ -n "$PYTORCH_WHEEL" ]]; then pip install "$PYTORCH_WHEEL" torchvision; fi
+#- if [[ "$TEST_MODE" != "DOCS" ]]; then pip install .[tests]; fi
+#- if [[ "$TEST_MODE" != "DOCS" ]]; then pip install flake8 flake8-docstrings; fi
+  - echo "INSTALL"
 
 script:
-  - if [[ "$TEST_MODE" == "DOCS" ]]; then python tools/make_transforms_docs.py check README.md; fi
-  - if [[ "$TEST_MODE" != "DOCS" ]]; then pytest; fi
-  - if [[ "$TEST_MODE" != "DOCS" ]]; then flake8; fi
-  - echo "TEST"
+#  - if [[ "$TEST_MODE" == "DOCS" ]]; then python tools/make_transforms_docs.py check README.md; fi
+#  - if [[ "$TEST_MODE" != "DOCS" ]]; then pytest; fi
+#  - if [[ "$TEST_MODE" != "DOCS" ]]; then flake8; fi
+  - echo "SCRIPT"
 
 
 #jobs:
