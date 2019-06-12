@@ -6,30 +6,22 @@ cache:
   directories:
     - $HOME/.cache/pip
 
-env:
-  - IMGAUG_NO_CV2_INSTALLED_CHECK=TRUE
-
-
-stage_test: &stage_test
-  os: linux
-  dist: trusty
-  language: python
-  install:
-    - echo "INSTALL"
-  script:
-    - echo "SCRIPT"
-
 stages:
   - test
 #  - deploy
 
-
 jobs:
   include:
     - stage: test
-      <<: *stage_test
       python: 2.7
       env: PYTORCH_WHEEL=https://download.pytorch.org/whl/cpu/torch-1.0.1.post2-cp27-cp27mu-linux_x86_64.whl
+      os: linux
+      dist: trusty
+      language: python
+      install:
+        - echo "INSTALL"
+      script:
+        - echo "SCRIPT"
 
     #- stage: deploy
 #      deploy:
