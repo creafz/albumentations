@@ -5,6 +5,7 @@ from warnings import warn
 
 import cv2
 from copy import deepcopy
+import numpy as np
 
 from albumentations.core.serialization import SerializableMeta
 from albumentations.core.six import add_metaclass
@@ -207,15 +208,52 @@ class DualTransform(BasicTransform):
             "keypoints": self.apply_to_keypoints,
         }
 
-    def apply_to_bbox(self, bbox, **params):
-        raise NotImplementedError("Method apply_to_bbox is not implemented in class " + self.__class__.__name__)
+    #def apply_to_bbox(self, bbox, **params):
+    #    raise NotImplementedError("Method apply_to_bbox is not implemented in class " + self.__class__.__name__)
 
     def apply_to_keypoint(self, keypoint, **params):
         raise NotImplementedError("Method apply_to_keypoint is not implemented in class " + self.__class__.__name__)
 
     def apply_to_bboxes(self, bboxes, **params):
+        if hasattr(self, 'apply_to_bbox'):
+            bboxes = [list(bbox) for bbox in bboxes]
+            return [self.apply_to_bbox(bbox[:4], **params) + bbox[4:] for bbox in bboxes]
+        return self.apply_to_bboxes_fallback(bboxes, **params)
+
+    def apply_to_bboxes_fallback(self, bboxes, rows, cols, **params):
+        from albumentations.augmentations.bbox_utils import denormalize_bbox, normalize_bbox
+
         bboxes = [list(bbox) for bbox in bboxes]
-        return [self.apply_to_bbox(bbox[:4], **params) + bbox[4:] for bbox in bboxes]
+        masks = np.zeros((rows, cols, len(bboxes)), dtype=np.uint8)
+        for i, bbox in enumerate(bboxes):
+            denormalized_bbox = denormalize_bbox(bbox[:4], rows, cols)
+            x_min, y_min, x_max, y_max = denormalized_bbox
+            masks[:, :, i] = cv2.rectangle(
+                np.zeros((rows, cols), dtype=np.uint8),
+                (int(x_min), int(y_min)),
+                (int(x_max), int(y_max)),
+                255,
+                cv2.FILLED,
+            )
+
+        transformed_bboxes = []
+        transformed_masks = self.apply(
+            masks, **{k: cv2.INTER_NEAREST if k == "interpolation" else v for k, v in params.items()}
+        )
+        for i in range(len(bboxes)):
+            mask = transformed_masks[:, :, i]
+            mask_contours, _ = cv2.findContours(
+                mask,
+                cv2.RETR_EXTERNAL,
+                cv2.CHAIN_APPROX_SIMPLE,
+            )
+            for contour in mask_contours:
+                x_min, y_min, width, height = cv2.boundingRect(contour)
+                x_max = x_min + width
+                y_max = y_min + height
+                bbox = [x_min, y_min, x_max, y_max] + bboxes[i][4:]
+                transformed_bboxes.append(normalize_bbox(bbox, rows, cols))
+        return transformed_bboxes
 
     def apply_to_keypoints(self, keypoints, **params):
         keypoints = [list(keypoint) for keypoint in keypoints]
