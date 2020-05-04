@@ -6,7 +6,7 @@ import random
 import numpy as np
 
 from albumentations.augmentations.keypoints_utils import KeypointsProcessor
-from albumentations.core.serialization import SerializableMeta
+from albumentations.core.serialization import SerializableMeta, CLASS_FULLNAME_KEY
 from albumentations.core.six import add_metaclass
 from albumentations.core.transforms_interface import DualTransform
 from albumentations.core.utils import format_args, Params
@@ -94,14 +94,14 @@ class BaseCompose:
 
     def _to_dict(self):
         return {
-            "__class_fullname__": self.get_class_fullname(),
+            CLASS_FULLNAME_KEY: self.get_class_fullname(),
             "p": self.p,
             "transforms": [t._to_dict() for t in self.transforms],  # skipcq: PYL-W0212
         }
 
     def get_dict_with_id(self):
         return {
-            "__class_fullname__": self.get_class_fullname(),
+            CLASS_FULLNAME_KEY: self.get_class_fullname(),
             "id": id(self),
             "params": None,
             "transforms": [t.get_dict_with_id() for t in self.transforms],
@@ -317,8 +317,8 @@ class ReplayCompose(Compose):
         if lmbd:
             transform = lmbd
         else:
-            name = transform["__class_fullname__"]
-            args = {k: v for k, v in transform.items() if k not in ["__class_fullname__", "applied", "params"]}
+            name = transform[CLASS_FULLNAME_KEY]
+            args = {k: v for k, v in transform.items() if k not in [CLASS_FULLNAME_KEY, "applied", "params"]}
             cls = SERIALIZABLE_REGISTRY[name]
             if "transforms" in args:
                 args["transforms"] = [

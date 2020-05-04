@@ -6,7 +6,7 @@ from warnings import warn
 import cv2
 from copy import deepcopy
 
-from albumentations.core.serialization import SerializableMeta
+from albumentations.core.serialization import SerializableMeta, CLASS_FULLNAME_KEY
 from albumentations.core.six import add_metaclass
 from albumentations.core.utils import format_args
 
@@ -183,7 +183,7 @@ class BasicTransform:
         return {k: getattr(self, k) for k in self.get_transform_init_args_names()}
 
     def _to_dict(self):
-        state = {"__class_fullname__": self.get_class_fullname()}
+        state = {CLASS_FULLNAME_KEY: self.get_class_fullname()}
         state.update(self.get_base_init_args())
         state.update(self.get_transform_init_args())
         return state

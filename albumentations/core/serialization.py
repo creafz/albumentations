@@ -11,11 +11,21 @@ except ImportError:
     yaml_available = False
 
 
+try:
+    from albumentations_experimental import __version__
+
+    albumentations_experimental_version = __version__
+except ImportError:
+    albumentations_experimental_version = None
+
+
 from albumentations import __version__
 
 
 __all__ = ["to_dict", "from_dict", "save", "load"]
 
+
+CLASS_FULLNAME_KEY = "__class_fullname__"
 
 SERIALIZABLE_REGISTRY = {}
 
@@ -28,8 +38,16 @@ class SerializableMeta(type):
 
     def __new__(cls, name, bases, class_dict):
         cls_obj = type.__new__(cls, name, bases, class_dict)
-        SERIALIZABLE_REGISTRY[cls_obj.get_class_fullname()] = cls_obj
+        SERIALIZABLE_REGISTRY[get_class_fullname(cls_obj)] = cls_obj
         return cls_obj
+
+
+def get_class_fullname(cls):
+    return "{cls.__module__}.{cls.__name__}".format(cls=cls)
+
+
+def get_obj_class_fullname(obj):
+    return get_class_fullname(obj.__class__)
 
 
 def to_dict(transform, on_not_implemented_error="raise"):
@@ -61,7 +79,11 @@ def to_dict(transform, on_not_implemented_error="raise"):
             "Implement either '{cls_name}.get_transform_init_args_names' or '{cls_name}.get_transform_init_args' "
             "method to make the transform serializable".format(obj=transform, cls_name=transform.__class__.__name__)
         )
-    return {"__version__": __version__, "transform": transform_dict}
+    return {
+        "__version__": __version__,
+        "__albumentations_experimental_version__": albumentations_experimental_version,
+        "transform": transform_dict,
+    }
 
 
 def instantiate_lambda(transform, lambda_transforms=None):
@@ -92,8 +114,8 @@ def from_dict(transform_dict, lambda_transforms=None):
     lmbd = instantiate_lambda(transform, lambda_transforms)
     if lmbd:
         return lmbd
-    name = transform["__class_fullname__"]
-    args = {k: v for k, v in transform.items() if k != "__class_fullname__"}
+    name = transform[CLASS_FULLNAME_KEY]
+    args = {k: v for k, v in transform.items() if k != CLASS_FULLNAME_KEY}
     cls = SERIALIZABLE_REGISTRY[name]
     if "transforms" in args:
         args["transforms"] = [
